@@ -2,25 +2,27 @@ import React, { useState } from 'react';
 import api from '../services/api';
 import { setToken } from '../utils/auth';
 
-const LoginForm = ({ onLoginSuccess }) => {
+const RegisterForm = ({ onRegisterSuccess }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
+  const [role] = useState('cliente'); 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await api.post('/users/login', { username, password });
+      const response = await api.post('/users/register', { username, password, email, role });
       setToken(response.data.token);
       localStorage.setItem('role', response.data.role);
-      onLoginSuccess();
+      onRegisterSuccess();
     } catch (error) {
-      alert('Error al iniciar sesión: ' + error.response.data.message);
+      alert('Error al registrar: ' + error.response.data.message);
     }
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <h2>Iniciar Sesión</h2>
+      <h2>Registro</h2>
       <input
         type="text"
         placeholder="Usuario"
@@ -30,12 +32,18 @@ const LoginForm = ({ onLoginSuccess }) => {
       <input
         type="password"
         placeholder="Contraseña"
-        value={password}  
+        value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
-      <button type="submit">Iniciar Sesión</button>
+      <input
+        type="email"
+        placeholder="Correo Electrónico"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+      <button type="submit">Registrarse</button>
     </form>
   );
 };
 
-export default LoginForm;
+export default RegisterForm;
