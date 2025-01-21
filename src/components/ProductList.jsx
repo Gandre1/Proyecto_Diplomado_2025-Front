@@ -17,18 +17,24 @@ const ProductList = () => {
   }, []);
 
   return (
-    <div>
-      <h2>Lista de Productos</h2>
-      <ul>
-        {products.map((product) => (
-          <li key={product._id}>
-            <h3>{product.name}</h3>
-            <p>{product.description}</p>
-            <p>Precio: ${product.price}</p>
-            <img src={product.imageUrl} alt={product.name} width="150" />
-          </li>
-        ))}
-      </ul>
+    <div className="card" style={{ width: '18rem', margin: '20px' }}>
+      <div className="card-header">
+      </div>
+      <div className="card-body">
+        <ul className="list-group list-group-flush">
+          {products.map((product) => (
+            <li key={product._id} className="list-group-item">
+              <h3>{product.name}</h3>
+              <p>{product.description}</p>
+              <p>Precio: ${product.price}</p>
+              <img src={product.imageUrl} alt={product.name} width="150" className="card-img-top" />
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className="card-body">
+        <a href="#" className="card-link">Ver más</a>
+      </div>
     </div>
   );
 };

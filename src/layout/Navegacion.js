@@ -34,13 +34,13 @@ const Navbar = () => {
               </a>
               <ul className="dropdown-menu">
                 <li>
-                  <a className="dropdown-item" href="#">
-                    <a href='/login'>Login/Register</a>
+                  <a className="dropdown-item" href="/login">
+                    <a >Iniciar Sesion</a>
                   </a>
                 </li>
                 <li>
-                  <a className="dropdown-item" href="#">
-                    a
+                  <a className="dropdown-item" href="/registrarse">
+                    Registrarse
                   </a>
                 </li>
                 <li>
