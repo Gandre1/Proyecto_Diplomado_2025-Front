@@ -35,7 +35,7 @@ const Navbar = () => {
               <ul className="dropdown-menu">
                 <li>
                   <a className="dropdown-item" href="/login">
-                    <a >Iniciar Sesion</a>
+                    Iniciar Sesion
                   </a>
                 </li>
                 <li>
@@ -47,8 +47,8 @@ const Navbar = () => {
                   <hr className="dropdown-divider" />
                 </li>
                 <li>
-                  <a className="dropdown-item" href="#">
-                    Más Informacion
+                  <a className="dropdown-item" href="/Carrito">
+                    Carrito
                   </a>
                 </li>
               </ul>

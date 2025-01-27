@@ -4,6 +4,8 @@ import LoginPage from '../pages/LoginPage';
 import ProductsPage from '../pages/ProductsPage';
 import AdminPage from '../pages/AdminPage';
 import RegisterPage from '../pages/RegisterPage';
+import LapidasPage from '../pages/LapidasPage';
+import CarritoPage from '../pages/CarritoPage';
 
 function App() {
   return (
@@ -13,6 +15,8 @@ function App() {
         <Route path='/login' element={<LoginPage />} />
         <Route path='/admin' element={<AdminPage />} />
         <Route path='/registrarse' element={<RegisterPage />} />
+        <Route path='/carrito' element={<CarritoPage />} />
+        <Route path='/product/lapidas' element={<LapidasPage />} />
       </Routes>
     </Router>
   );

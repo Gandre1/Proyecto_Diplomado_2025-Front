@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../services/api';
 
 const ProductList = () => {
@@ -17,24 +18,22 @@ const ProductList = () => {
   }, []);
 
   return (
-    <div className="card" style={{ width: '18rem', margin: '20px' }}>
-      <div className="card-header">
-      </div>
-      <div className="card-body">
-        <ul className="list-group list-group-flush">
-          {products.map((product) => (
-            <li key={product._id} className="list-group-item">
-              <h3>{product.name}</h3>
-              <p>{product.description}</p>
+    <div className="row">
+      {products.map((product) => (
+        <div key={product._id} className="col-md-4 mb-4">
+          <div className="card" style={{ width: '18rem' }}>
+            <img src={product.imageUrl} alt={product.name} className="card-img-top" />
+            <div className="card-body">
+              <h5 className="card-title">{product.name}</h5>
+              <p className="card-text">{product.description}</p>
               <p>Precio: ${product.price}</p>
-              <img src={product.imageUrl} alt={product.name} width="150" className="card-img-top" />
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className="card-body">
-        <a href="#" className="card-link">Ver más</a>
-      </div>
+              <Link to={`/product/lapidas`} className="btn btn-primary">
+                Ver Mas
+              </Link>
+            </div>
+          </div>
+        </div>
+      ))}
     </div>
   );
 };
