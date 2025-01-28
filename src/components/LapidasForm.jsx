@@ -6,40 +6,46 @@ const LapidaForm = ({ product }) => {
   const [fechaNacimiento, setFechaNacimiento] = useState('');
   const [fechaDefuncion, setFechaDefuncion] = useState('');
   const [numeroLocalizacion, setNumeroLocalizacion] = useState('');
-  const [tiposLapida, setTiposLapida] = useState('');
-  const [tiposDiseno, setTiposDiseno] = useState('');
-  const [imagenUrl, setImagenUrl] = useState('/images/lapidas/default.jpg');
-  const [lapidaOptions, setLapidaOptions] = useState({
-    tiposLapida: [],
-    tiposDiseno: [],
-    imagePreviews: {},
-  });
-  const [isLoading, setIsLoading] = useState(true);
+  const [tiposLapida, setTiposLapida] = useState([]);
+  const [tiposDiseno, setTiposDiseno] = useState([]);
+  const [tipoSeleccionado, setTipoSeleccionado] = useState('');
+  const [disenoSeleccionado, setDisenoSeleccionado] = useState('');
+  const [imagenVistaPrevia, setImagenVistaPrevia] = useState('');
+  const API_URL = "http://localhost:5000/api";
 
   useEffect(() => {
-    const fetchOptions = async () => {
+    const fetchLapidaOptions = async () => {
       try {
         const response = await api.get('/lapidas/options');
-        console.log('Opciones de lápidas:', response.data);
-        setLapidaOptions(response.data);
+        setTiposLapida(response.data);
+        setTiposDiseno(response.data); 
       } catch (error) {
-        console.error('Error al cargar opciones de lápidas:', error);
+        console.error('Error al obtener los datos de lápidas:', error);
       }
     };
-  
-    fetchOptions();
-  }, []);  
-  
-  
+    fetchLapidaOptions();
+  }, []);
+   
   useEffect(() => {
-    if (tiposLapida && tiposDiseno && lapidaOptions.imagePreviews[tiposLapida]?.[tiposDiseno]) {
-      const newImageUrl = lapidaOptions.imagePreviews[tiposLapida][tiposDiseno];
-      console.log('Imagen seleccionada:', newImageUrl);
-      setImagenUrl(newImageUrl);
+    const tipo = tiposLapida.find(lapida => lapida.tipoLapida._id === tipoSeleccionado);
+    if (tipo) {
+      setTiposDiseno(tipo.disenos);
     }
-  }, [tiposLapida, tiposDiseno, lapidaOptions]);
+  }, [tipoSeleccionado, tiposLapida]);
 
+  useEffect(() => {
+    const diseno = tiposDiseno.find(diseno => diseno._id === disenoSeleccionado);
+    if (diseno) {
+      setImagenVistaPrevia(diseno.imagen);
+      console.log('Imagen de diseño:', diseno.imagen)
+    }
+  }, [disenoSeleccionado, tiposDiseno]);
+  
   const handleAddToCart = async () => {
+    if (!nombreMuerto || !fechaNacimiento || !fechaDefuncion || !numeroLocalizacion) {
+      alert('Por favor, completa todos los campos obligatorios.');
+      return;
+    }
     try {
       const lapidaDetails = {
         nombreMuerto,
@@ -50,24 +56,25 @@ const LapidaForm = ({ product }) => {
         tiposDiseno,
         precio: product.precio,
       };
-
+  
       await api.post('/carrito', {
         productType: 'lapida',
         productId: product._id,
         productDetails: lapidaDetails,
         cantidad: 1,
       });
-
+  
       alert('Lápida personalizada agregada al carrito');
     } catch (error) {
       console.error('Error al agregar al carrito:', error);
     }
-  };
+  };  
 
   return (
     <div className="container">
       <form className="form-group">
         <h3>Personalizar Lápida</h3>
+        
         <div className="mb-3">
           <label>Nombre del fallecido:</label>
           <input
@@ -109,55 +116,44 @@ const LapidaForm = ({ product }) => {
 
         <div className="mb-3">
           <label>Tipo de lápida:</label>
-          <select
-            className="form-control"
-            value={tiposLapida}
-            onChange={(e) => setTiposLapida(e.target.value)}
-          >
+          <select className="form-control" value={tipoSeleccionado} onChange={(e) => setTipoSeleccionado(e.target.value)}>
             <option value="">Seleccione</option>
-            {isLoading ? (
-              <option value="">Cargando opciones...</option>
-            ) : (
-              lapidaOptions.tiposLapida.length > 0 ? (
-                lapidaOptions.tiposLapida.map((tipo) => (
-                  <option key={tipo} value={tipo}>
-                    {tipo}
-                  </option>
-                ))
-              ) : (
-                <option value="">No hay opciones disponibles</option>
-              )
-            )}
+            {tiposLapida.map((lapida) => (
+              <option key={lapida.tipoLapida._id} value={lapida.tipoLapida._id}>
+                {lapida.tipoLapida.nombre}
+              </option>
+            ))}
           </select>
+          {tipoSeleccionado && (
+            <div className="mt-2">
+              <img 
+                src={API_URL + tiposLapida.find(lapida => lapida.tipoLapida._id === tipoSeleccionado)?.tipoLapida.imagen || '/images/lapidas/default.jpg'} 
+                alt="Vista previa tipo lápida"
+                style={{ width: '200px', height: 'auto' }}
+              />
+            </div>
+          )}
         </div>
 
         <div className="mb-3">
           <label>Diseño:</label>
-          <select
-            className="form-control"
-            value={tiposDiseno}
-            onChange={(e) => setTiposDiseno(e.target.value)}
-          >
+          <select className="form-control" value={disenoSeleccionado} onChange={(e) => setDisenoSeleccionado(e.target.value)}>
             <option value="">Seleccione</option>
-            {isLoading ? (
-              <option value="">Cargando opciones...</option>
-            ) : (
-              lapidaOptions.tiposDiseno.length > 0 ? (
-                lapidaOptions.tiposDiseno.map((diseno) => (
-                  <option key={diseno} value={diseno}>
-                    {diseno}
-                  </option>
-                ))
-              ) : (
-                <option value="">No hay opciones disponibles</option>
-              )
-            )}
+            {tiposDiseno.map((diseno) => (
+              <option key={diseno._id} value={diseno._id}>
+                {diseno.nombre}
+              </option>
+            ))}
           </select>
-        </div>
-
-        <div className="mb-3">
-          <label>Vista previa:</label>
-          <img src={`http://localhost:5000${imagenUrl}`} alt="Vista previa" className="img-fluid" />
+          {disenoSeleccionado && (
+            <div className="mt-2">
+              <img 
+                src={API_URL + imagenVistaPrevia || '/images/lapidas/default.jpg'}
+                alt="Vista previa diseño" 
+                style={{ width: '200px', height: 'auto' }}
+              />
+            </div>
+          )}
         </div>
 
         <button
