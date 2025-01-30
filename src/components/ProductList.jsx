@@ -21,17 +21,16 @@ const ProductList = () => {
     <div className="row">
       {products.map((product) => (
         <div key={product._id} className="col-md-4 mb-4">
+          <Link to={`/product/lapidas`} className="btn">
           <div className="card" style={{ width: '18rem' }}>
             <img src={product.imageUrl} alt={product.name} className="card-img-top" />
             <div className="card-body">
               <h5 className="card-title">{product.name}</h5>
               <p className="card-text">{product.description}</p>
               <p>Precio: ${product.price}</p>
-              <Link to={`/product/lapidas`} className="btn btn-primary">
-                Ver Mas
-              </Link>
             </div>
           </div>
+          </Link>
         </div>
       ))}
     </div>

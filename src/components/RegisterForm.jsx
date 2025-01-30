@@ -58,7 +58,8 @@ const RegisterForm = ({ onRegisterSuccess }) => {
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
-          <button type="submit" className="btn btn-primary">Registrarse</button>
+          <button type="submit" className="btn btn-primary">Regi+
+            strarse</button>
         </form>
       </div>
     </div>
