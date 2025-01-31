@@ -1,51 +1,96 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // Importa useNavigate para redirigir
 import api from '../services/api';
 
 const LapidaForm = () => {
   const [nombreMuerto, setNombreMuerto] = useState('');
   const [fechaNacimiento, setFechaNacimiento] = useState('');
   const [fechaDefuncion, setFechaDefuncion] = useState('');
-  const [numeroLocalizacion, setNumeroLocalizacion] = useState('');
-  const [tiposLapida, setTiposLapida] = useState([]);
-  const [tiposDiseno, setTiposDiseno] = useState([]);
-  const [tipoSeleccionado, setTipoSeleccionado] = useState('');
   const [disenoSeleccionado, setDisenoSeleccionado] = useState('');
-  const [imagenVistaPrevia, setImagenVistaPrevia] = useState('');
+  const [lapidas, setLapidas] = useState([]); 
+  const [disenos, setDisenos] = useState([]); 
+  const [imagenDiseno, setImagenDiseno] = useState('');
+  const [error, setError] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();   
+
   const API_URL = "http://localhost:5000/api";
+
   const formatDate = (date) => {
     if (!date) return '';
     const months = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
     const [year, month, day] = date.split('-');
     return `${months[parseInt(month) - 1]}. ${parseInt(day)} - ${year}`;
   };
-  
 
   useEffect(() => {
-    const fetchLapidaOptions = async () => {
+    const fetchDatosLapida = async () => {
       try {
-        const response = await api.get('/lapidas/options');
-        setTiposLapida(response.data);
+        const response = await api.get('/lapidas');
+        setLapidas(response.data.lapidas || []);
+        setDisenos(response.data.disenos || []);
+        console.log('Datos de lápidas:', response.data);
       } catch (error) {
         console.error('Error al obtener los datos de lápidas:', error);
       }
     };
-    fetchLapidaOptions();
+    fetchDatosLapida();
   }, []);
-   
-  useEffect(() => {
-    const tipo = tiposLapida.find(lapida => lapida.tipoLapida._id === tipoSeleccionado);
-    if (tipo) {
-      setTiposDiseno(tipo.disenos);
-      setImagenVistaPrevia(tipo.tipoLapida.imagen);
-    }
-  }, [tipoSeleccionado, tiposLapida]);
 
   useEffect(() => {
-    const diseno = tiposDiseno.find(diseno => diseno._id === disenoSeleccionado);
-    if (diseno) {
-      setImagenVistaPrevia(diseno.imagen);
+    if (disenoSeleccionado) {
+      const diseno = disenos.find(diseno => diseno._id === disenoSeleccionado);
+      if (diseno) {
+        setImagenDiseno(diseno.imagen);
+      }
+    } else {
+      setImagenDiseno('');
     }
-  }, [disenoSeleccionado, tiposDiseno]);
+  }, [disenoSeleccionado, disenos]);
+
+  const agregarAlCarrito = async () => {
+    if (!nombreMuerto || !fechaNacimiento || !fechaDefuncion || !disenoSeleccionado) {
+      setError('Por favor complete todos los campos antes de agregar al carrito.');
+      return;
+    }
+    setError('');
+
+    if (lapidas.length > 0) {
+      const lapidaSeleccionada = lapidas[0];
+      const detallesProducto = {
+        nombreMuerto,
+        fechaNacimiento,
+        fechaDefuncion,
+        diseno: disenoSeleccionado,
+        precio: lapidaSeleccionada.precio,
+      };
+      const nombreProducto = lapidaSeleccionada.nombre;
+      const cantidad = 1;
+      const precioTotal = lapidaSeleccionada.precio * cantidad;
+
+      try {
+        await api.post('/carrito', {
+          nombreProducto,
+          detallesProducto,
+          cantidad,
+          precioTotal,
+        });
+        setShowModal(true);
+      } catch (error) {
+        console.error('Error al agregar al carrito:', error);
+        alert('Error al agregar al carrito');
+      }
+    }
+  };
+
+  const handleModalAction = (action) => {
+    if (action === 'goToCart') {
+      navigate('/carrito');
+    } else {
+      navigate('/');
+    }
+    setShowModal(false);
+  };
 
   return (
     <div className="container mt-4">
@@ -55,14 +100,28 @@ const LapidaForm = () => {
             className="border p-3 position-relative text-center bg-light"
             style={{ borderRadius: '10px', overflow: 'hidden', position: 'relative' }}
           >
-            {imagenVistaPrevia ? (
+            {lapidas[0] && (
               <img 
-                src={API_URL + imagenVistaPrevia} 
-                alt="Vista previa" 
+                src={API_URL + lapidas[0].imagen} 
+                alt="Imagen de Lápida"
                 style={{ width: '100%', height: 'auto', borderRadius: '10px' }}
               />
-            ) : (
-              <p>Seleccione un tipo de lápida</p>
+            )}
+            
+            {imagenDiseno && (
+              <img 
+                src={API_URL + imagenDiseno} 
+                alt="Imagen de Diseño"
+                style={{
+                  position: 'absolute',
+                  top: 50,
+                  left: 85,
+                  width: '15%',
+                  height: '15%',
+                  objectFit: 'cover',
+                  borderRadius: '10px',
+                }}
+              />
             )}
 
             <div 
@@ -88,6 +147,8 @@ const LapidaForm = () => {
         <div className="col-md-8">
           <div className="border p-4 bg-white" style={{ borderRadius: '10px' }}>
             <h3>Personalizar Lápida</h3>
+
+            {error && <div className="alert alert-danger">{error}</div>}
 
             <div className="mb-3">
               <label>Nombre del fallecido:</label>
@@ -117,35 +178,17 @@ const LapidaForm = () => {
                 onChange={(e) => setFechaDefuncion(e.target.value)}
               />
             </div>
-            <div className="mb-3">
-              <label>Número de localización:</label>
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Número de localización"
-                value={numeroLocalizacion}
-                onChange={(e) => setNumeroLocalizacion(e.target.value)}
-              />
-            </div>
-
-            <div className="mb-3">
-              <label>Tipo de lápida:</label>
-              <select className="form-control" value={tipoSeleccionado} onChange={(e) => setTipoSeleccionado(e.target.value)}>
-                <option value="">Seleccione</option>
-                {tiposLapida.map((lapida) => (
-                  <option key={lapida.tipoLapida._id} value={lapida.tipoLapida._id}>
-                    {lapida.tipoLapida.nombre}
-                  </option>
-                ))}
-              </select>
-            </div>
 
             <div className="mb-3">
               <label>Diseño:</label>
-              <select className="form-control" value={disenoSeleccionado} onChange={(e) => setDisenoSeleccionado(e.target.value)}>
+              <select
+                className="form-control"
+                value={disenoSeleccionado}
+                onChange={(e) => setDisenoSeleccionado(e.target.value)}
+              >
                 <option value="">Seleccione</option>
-                {tiposDiseno.map((diseno) => (
-                  <option key={diseno._id} value={diseno._id}>
+                {disenos.map((diseno) => (
+                  <option key={diseno._id} value={diseno.nombre}>
                     {diseno.nombre}
                   </option>
                 ))}
@@ -153,19 +196,50 @@ const LapidaForm = () => {
             </div>
 
             <div className="mb-3">
-              <label>Precio:</label>
-  
+              <label>Precio: </label>
+              {lapidas[0] && (
+                <span style={{ marginLeft: '5px' }}>
+                  ${lapidas[0].precio}
+                </span>
+              )}
             </div>
 
             <button
               type="button"
               className="btn btn-primary"
+              onClick={agregarAlCarrito}
             >
               Agregar al Carrito
             </button>
           </div>
         </div>
       </div>
+
+      {showModal && (
+        <div className="modal fade show" tabIndex="-1" style={{ display: 'block' }} aria-hidden="true">
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Producto Agregado</h5>
+                <button type="button" className="close" onClick={() => setShowModal(false)} aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                <p>¿Desea ir al carrito?</p>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={() => handleModalAction('goToCart')}>
+                  Ir al Carrito
+                </button>
+                <button type="button" className="btn btn-primary" onClick={() => handleModalAction('goHome')}>
+                  Volver al Inicio
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
