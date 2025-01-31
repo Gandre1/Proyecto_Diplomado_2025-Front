@@ -23,15 +23,14 @@ const Navbar = () => {
           >
           
             <li className="nav-item dropdown">
-              <a
-                className="nav-link dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                Más
-              </a>
+            <button
+              className="nav-link dropdown-toggle"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              Más
+            </button>
+
               <ul className="dropdown-menu">
                 <li>
                   <a className="dropdown-item" href="/login">
