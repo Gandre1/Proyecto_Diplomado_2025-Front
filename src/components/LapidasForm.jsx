@@ -39,14 +39,14 @@ const LapidaForm = () => {
 
   useEffect(() => {
     if (disenoSeleccionado) {
-      const diseno = disenos.find(diseno => diseno._id === disenoSeleccionado);
+      const diseno = disenos.find(d => d._id === disenoSeleccionado);
       if (diseno) {
         setImagenDiseno(diseno.imagen);
       }
     } else {
       setImagenDiseno('');
     }
-  }, [disenoSeleccionado, disenos]);
+  }, [disenoSeleccionado, disenos]);  
 
   const agregarAlCarrito = async () => {
     if (!nombreMuerto || !fechaNacimiento || !fechaDefuncion || !disenoSeleccionado) {
@@ -54,20 +54,26 @@ const LapidaForm = () => {
       return;
     }
     setError('');
-
+  
     if (lapidas.length > 0) {
       const lapidaSeleccionada = lapidas[0];
+  
+      // Buscar el nombre del diseño basado en el ID seleccionado
+      const diseno = disenos.find(d => d._id === disenoSeleccionado);
+      const nombreDiseno = diseno ? diseno.nombre : 'Desconocido';
+  
       const detallesProducto = {
         nombreMuerto,
         fechaNacimiento,
         fechaDefuncion,
-        diseno: disenoSeleccionado,
+        diseno: nombreDiseno,
         precio: lapidaSeleccionada.precio,
       };
+  
       const nombreProducto = lapidaSeleccionada.nombre;
       const cantidad = 1;
       const precioTotal = lapidaSeleccionada.precio * cantidad;
-
+  
       try {
         await api.post('/carrito', {
           nombreProducto,
@@ -82,6 +88,7 @@ const LapidaForm = () => {
       }
     }
   };
+  
 
   const handleModalAction = (action) => {
     if (action === 'goToCart') {
@@ -110,7 +117,7 @@ const LapidaForm = () => {
             
             {imagenDiseno && (
               <img 
-                src={API_URL + imagenDiseno} 
+                src={`${API_URL}${imagenDiseno}`} 
                 alt="Imagen de Diseño"
                 style={{
                   position: 'absolute',
@@ -123,6 +130,7 @@ const LapidaForm = () => {
                 }}
               />
             )}
+
 
             <div 
               className="position-absolute text-center"
@@ -188,7 +196,7 @@ const LapidaForm = () => {
               >
                 <option value="">Seleccione</option>
                 {disenos.map((diseno) => (
-                  <option key={diseno._id} value={diseno.nombre}>
+                  <option key={diseno._id} value={diseno._id}>
                     {diseno.nombre}
                   </option>
                 ))}
