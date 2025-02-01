@@ -1,10 +1,11 @@
-import React from 'react';
+import React from "react";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   return (
     <nav className="navbar navbar-expand-lg bg-dark border-bottom border-body" data-bs-theme="dark">
       <div className="container-fluid">
-        <a className="navbar-brand" href="/">Inicio</a>
+        <Link className="navbar-brand" to="/">Inicio</Link>
         <button
           className="navbar-toggler"
           type="button"
@@ -19,36 +20,34 @@ const Navbar = () => {
         <div className="collapse navbar-collapse" id="navbarScroll">
           <ul
             className="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll"
-            style={{ '--bs-scroll-height': '100px' }}
+            style={{ "--bs-scroll-height": "100px" }}
           >
-          
             <li className="nav-item dropdown">
-            <button
-              className="nav-link dropdown-toggle"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              Más
-            </button>
-
+              <button
+                className="nav-link dropdown-toggle"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Más
+              </button>
               <ul className="dropdown-menu">
                 <li>
-                  <a className="dropdown-item" href="/login">
-                    Iniciar Sesion
-                  </a>
+                  <Link className="dropdown-item" to="/login">
+                    Iniciar Sesión
+                  </Link>
                 </li>
                 <li>
-                  <a className="dropdown-item" href="/registrarse">
+                  <Link className="dropdown-item" to="/registrarse">
                     Registrarse
-                  </a>
+                  </Link>
                 </li>
                 <li>
                   <hr className="dropdown-divider" />
                 </li>
                 <li>
-                  <a className="dropdown-item" href="/Carrito">
+                  <Link className="dropdown-item" to="/carrito">
                     Carrito
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </li>
