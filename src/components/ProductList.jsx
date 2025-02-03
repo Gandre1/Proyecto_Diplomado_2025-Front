@@ -21,7 +21,7 @@ const ProductList = () => {
     <div className="row">
       {products.map((product) => (
         <div key={product._id} className="col-md-4 mb-4">
-          <Link to={`/product` + product.url} className="btn">
+          <Link to={`/product/lapida/${product.idProducto}`} className="btn">
             <div className="card" style={{ width: '18rem' }}>
               <img 
                 src={api.defaults.baseURL + product.imagen}

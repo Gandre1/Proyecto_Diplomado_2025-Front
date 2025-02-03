@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import api from '../services/api';
 
 const LapidaForm = () => {
+  const { lapidaId } = useParams(); 
+  const [lapida, setLapida] = useState(null);
   const [nombreMuerto, setNombreMuerto] = useState('');
   const [fechaNacimiento, setFechaNacimiento] = useState('');
   const [fechaDefuncion, setFechaDefuncion] = useState('');
   const [disenoSeleccionado, setDisenoSeleccionado] = useState('');
-  const [lapidas, setLapidas] = useState([]); 
-  const [disenos, setDisenos] = useState([]); 
+  const [disenos, setDisenos] = useState([]);
   const [imagenDiseno, setImagenDiseno] = useState('');
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
-  const navigate = useNavigate();   
+  const navigate = useNavigate();
 
   const formatDate = (date) => {
     if (!date) return '';
@@ -20,20 +21,19 @@ const LapidaForm = () => {
     const [year, month, day] = date.split('-');
     return `${months[parseInt(month) - 1]}. ${parseInt(day)} - ${year}`;
   };
-
+    
   useEffect(() => {
-    const fetchDatosLapida = async () => {
+    const fetchLapidaData = async () => {
       try {
-        const response = await api.get('/lapidas');
-        setLapidas(response.data.lapidas || []);
+        const response = await api.get(`/lapidas/${lapidaId}`);
+        setLapida(response.data.lapida);
         setDisenos(response.data.disenos || []);
-        console.log('Datos de lápidas:', response.data);
       } catch (error) {
-        console.error('Error al obtener los datos de las lápidas:', error);
+        console.error('Error al obtener los datos de la lápida:', error);
       }
     };
-    fetchDatosLapida();
-  }, []);
+    fetchLapidaData();
+  }, [lapidaId]);
 
   useEffect(() => {
     if (disenoSeleccionado) {
@@ -44,7 +44,7 @@ const LapidaForm = () => {
     } else {
       setImagenDiseno('');
     }
-  }, [disenoSeleccionado, disenos]);  
+  }, [disenoSeleccionado, disenos]);
 
   const agregarAlCarrito = async () => {
     if (!nombreMuerto || !fechaNacimiento || !fechaDefuncion || !disenoSeleccionado) {
@@ -52,25 +52,23 @@ const LapidaForm = () => {
       return;
     }
     setError('');
-  
-    if (lapidas.length > 0) {
-      const lapidaSeleccionada = lapidas[0];
-  
+
+    if (lapida) {
       const diseno = disenos.find(d => d._id === disenoSeleccionado);
-      const nombreDiseno = diseno ? diseno.nombre : 'Desconocido';
-  
+      const nombreDiseno = diseno;
+
       const detallesProducto = {
         nombreMuerto,
         fechaNacimiento,
         fechaDefuncion,
         diseno: nombreDiseno,
-        precio: lapidaSeleccionada.precio,
+        precio: lapida.precio,
       };
-  
-      const nombreProducto = lapidaSeleccionada.nombre;
+
+      const nombreProducto = lapida.nombre;
       const cantidad = 1;
-      const precioTotal = lapidaSeleccionada.precio * cantidad;
-  
+      const precioTotal = lapida.precio * cantidad;
+
       try {
         await api.post('/carrito', {
           nombreProducto,
@@ -85,7 +83,6 @@ const LapidaForm = () => {
       }
     }
   };
-  
 
   const handleModalAction = (action) => {
     if (action === 'goToCart') {
@@ -96,25 +93,24 @@ const LapidaForm = () => {
     setShowModal(false);
   };
 
+  if (!lapida) return <div>Cargando...</div>;
+
   return (
     <div className="container mt-4">
       <div className="row">
         <div className="col-md-4">
-          <div 
+          <div
             className="border p-3 position-relative text-center bg-light"
             style={{ borderRadius: '10px', overflow: 'hidden', position: 'relative' }}
           >
-            {lapidas[0] && (
-              <img 
-                src={api.defaults.baseURL + lapidas[0].imagen} 
-                alt="Imagen de Lápida"
-                style={{ width: '100%', height: 'auto', borderRadius: '10px' }}
-              />
-            )}
-            
+            <img
+              src={api.defaults.baseURL + lapida.imagen}
+              alt="Imagen de Lápida"
+              style={{ width: '100%', height: 'auto', borderRadius: '10px' }}
+            />
             {imagenDiseno && (
-              <img 
-                src={`${api.defaults.baseURL}${imagenDiseno}`} 
+              <img
+                src={`${api.defaults.baseURL}${imagenDiseno}`}
                 alt="Imagen de Diseño"
                 style={{
                   position: 'absolute',
@@ -127,9 +123,7 @@ const LapidaForm = () => {
                 }}
               />
             )}
-
-
-            <div 
+            <div
               className="position-absolute text-center"
               style={{
                 top: '50%',
@@ -139,7 +133,7 @@ const LapidaForm = () => {
                 color: '#000',
                 fontWeight: 'bold',
                 textShadow: '1px 1px 5px rgba(255, 255, 255, 0.8)',
-                fontFamily: 'serif'
+                fontFamily: 'serif',
               }}
             >
               <h4>{nombreMuerto || 'Nombre del Fallecido'}</h4>
@@ -202,18 +196,10 @@ const LapidaForm = () => {
 
             <div className="mb-3">
               <label>Precio: </label>
-              {lapidas[0] && (
-                <span style={{ marginLeft: '5px' }}>
-                  ${lapidas[0].precio}
-                </span>
-              )}
+              <span style={{ marginLeft: '5px' }}>${lapida.precio}</span>
             </div>
 
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={agregarAlCarrito}
-            >
+            <button type="button" className="btn btn-primary" onClick={agregarAlCarrito}>
               Agregar al Carrito
             </button>
           </div>

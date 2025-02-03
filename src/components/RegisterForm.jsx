@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import api from '../services/api';
-import { setToken } from '../utils/auth';
 
 const RegisterForm = ({ onRegisterSuccess }) => {
   const [username, setUsername] = useState('');
@@ -12,7 +11,6 @@ const RegisterForm = ({ onRegisterSuccess }) => {
     e.preventDefault();
     try {
       const response = await api.post('/users/register', { username, password, email, role });
-      setToken(response.data.token);
       localStorage.setItem('role', response.data.role);
       onRegisterSuccess();
     } catch (error) {
