@@ -56,7 +56,6 @@ const LapidaForm = () => {
     if (lapidas.length > 0) {
       const lapidaSeleccionada = lapidas[0];
   
-      // Buscar el nombre del diseño basado en el ID seleccionado
       const diseno = disenos.find(d => d._id === disenoSeleccionado);
       const nombreDiseno = diseno ? diseno.nombre : 'Desconocido';
   

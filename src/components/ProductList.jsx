@@ -24,7 +24,7 @@ const ProductList = () => {
           <Link to={`/product` + product.url} className="btn">
             <div className="card" style={{ width: '18rem' }}>
               <img 
-                src={product.imagen ? api.defaults.baseURL + product.imagen : ''}
+                src={api.defaults.baseURL + product.imagen}
                 alt={product.nombre} 
                 className="card-img-top" 
               />
