@@ -16,7 +16,7 @@ function App() {
         <Route path='/admin' element={<AdminPage />} />
         <Route path='/registrarse' element={<RegisterPage />} />
         <Route path='/carrito' element={<CarritoPage />} />
-        <Route path='/product/lapida/:id' element={<LapidasPage />} />
+        <Route path='/product/lapida/:lapidaId' element={<LapidasPage />} />
       </Routes>
     </Router>
   );

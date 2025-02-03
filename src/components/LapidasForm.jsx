@@ -26,14 +26,31 @@ const LapidaForm = () => {
     const fetchLapidaData = async () => {
       try {
         const response = await api.get(`/lapidas/${lapidaId}`);
-        setLapida(response.data.lapida);
-        setDisenos(response.data.disenos || []);
+
+        if (response.data.lapidas && response.data.lapidas.length > 0) {
+          const lapidaSeleccionada = response.data.lapidas.find(lapida => lapida._id === lapidaId);
+          setLapida(lapidaSeleccionada);
+        } else {
+          console.error('No se encontraron lápidas en la respuesta');
+        }
+  
+        if (response.data.disenos && response.data.disenos.length > 0) {
+          console.log('Diseños disponibles:', response.data.disenos);
+          setDisenos(response.data.disenos);
+        } else {
+          console.error('No se encontraron diseños en la respuesta');
+        }
+  
       } catch (error) {
         console.error('Error al obtener los datos de la lápida:', error);
+        setError('No se pudo obtener los detalles de la lápida');
       }
     };
+  
     fetchLapidaData();
   }, [lapidaId]);
+  
+   
 
   useEffect(() => {
     if (disenoSeleccionado) {
@@ -52,11 +69,11 @@ const LapidaForm = () => {
       return;
     }
     setError('');
-
+  
     if (lapida) {
       const diseno = disenos.find(d => d._id === disenoSeleccionado);
-      const nombreDiseno = diseno;
-
+      const nombreDiseno = diseno ? diseno.nombre : '';
+  
       const detallesProducto = {
         nombreMuerto,
         fechaNacimiento,
@@ -64,11 +81,11 @@ const LapidaForm = () => {
         diseno: nombreDiseno,
         precio: lapida.precio,
       };
-
+  
       const nombreProducto = lapida.nombre;
       const cantidad = 1;
       const precioTotal = lapida.precio * cantidad;
-
+  
       try {
         await api.post('/carrito', {
           nombreProducto,
@@ -83,6 +100,7 @@ const LapidaForm = () => {
       }
     }
   };
+  
 
   const handleModalAction = (action) => {
     if (action === 'goToCart') {

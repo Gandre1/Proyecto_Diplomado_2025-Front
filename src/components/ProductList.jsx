@@ -18,24 +18,26 @@ const ProductList = () => {
   }, []);
 
   return (
-    <div className="row">
-      {products.map((product) => (
-        <div key={product._id} className="col-md-4 mb-4">
-          <Link to={`/product/lapida/${product.idProducto}`} className="btn">
-            <div className="card" style={{ width: '18rem' }}>
-              <img 
-                src={api.defaults.baseURL + product.imagen}
-                alt={product.nombre} 
-                className="card-img-top" 
-              />
-              <div className="card-body">
-                <h5 className="card-title">{product.nombre}</h5>
-                <p>Precio: ${product.precio}</p>
+    <div className="container">
+      <div className="row">
+        {products.map((product) => (
+          <div key={product._id} className="col-6 col-sm-4 col-md-3 col-lg-3">
+            <Link to={`/product/lapida/${product.idProducto}`} className="btn">
+              <div className="card">
+                <img 
+                  src={api.defaults.baseURL + product.imagen}
+                  alt={product.nombre} 
+                  className="card-img-top" 
+                />
+                <div className="card-body">
+                  <h5 className="card-title">{product.nombre}</h5>
+                  <p>Precio: ${product.precio}</p>
+                </div>
               </div>
-            </div>
-          </Link>
-        </div>
-      ))}
+            </Link>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
