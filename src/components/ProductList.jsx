@@ -4,7 +4,6 @@ import api from '../services/api';
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
-  const API_URL = "http://localhost:5000/api";
   
   useEffect(() => {
     const fetchProducts = async () => {
@@ -23,13 +22,17 @@ const ProductList = () => {
       {products.map((product) => (
         <div key={product._id} className="col-md-4 mb-4">
           <Link to={`/product` + product.url} className="btn">
-          <div className="card" style={{ width: '18rem' }}>
-            <img src={API_URL + product.imagen} alt={product.nombre} className="card-img-top" />
-            <div className="card-body">
-              <h5 className="card-title">{product.nombre}</h5>
-              <p>Precio: ${product.precio}</p>
+            <div className="card" style={{ width: '18rem' }}>
+              <img 
+                src={product.imagen ? api.defaults.baseURL + product.imagen : ''}
+                alt={product.nombre} 
+                className="card-img-top" 
+              />
+              <div className="card-body">
+                <h5 className="card-title">{product.nombre}</h5>
+                <p>Precio: ${product.precio}</p>
+              </div>
             </div>
-          </div>
           </Link>
         </div>
       ))}

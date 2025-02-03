@@ -14,8 +14,6 @@ const LapidaForm = () => {
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();   
 
-  const API_URL = "http://localhost:5000/api";
-
   const formatDate = (date) => {
     if (!date) return '';
     const months = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
@@ -109,7 +107,7 @@ const LapidaForm = () => {
           >
             {lapidas[0] && (
               <img 
-                src={API_URL + lapidas[0].imagen} 
+                src={api.defaults.baseURL + lapidas[0].imagen} 
                 alt="Imagen de Lápida"
                 style={{ width: '100%', height: 'auto', borderRadius: '10px' }}
               />
@@ -117,7 +115,7 @@ const LapidaForm = () => {
             
             {imagenDiseno && (
               <img 
-                src={`${API_URL}${imagenDiseno}`} 
+                src={`${api.defaults.baseURL}${imagenDiseno}`} 
                 alt="Imagen de Diseño"
                 style={{
                   position: 'absolute',
