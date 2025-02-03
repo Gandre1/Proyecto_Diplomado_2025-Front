@@ -29,7 +29,7 @@ const LapidaForm = () => {
         setDisenos(response.data.disenos || []);
         console.log('Datos de lápidas:', response.data);
       } catch (error) {
-        console.error('Error al obtener los datos de lápidas:', error);
+        console.error('Error al obtener los datos de las lápidas:', error);
       }
     };
     fetchDatosLapida();
