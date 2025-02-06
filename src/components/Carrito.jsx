@@ -43,8 +43,7 @@ const Cart = () => {
   const handleQuantityChange = async (id, newQuantity) => {
     const updatedCartItems = cartItems.map((item) => {
       if (item._id === id) {
-        const updatedItem = { ...item, cantidad: newQuantity, precioTotal: item.detallesProducto.precio * newQuantity };
-        return updatedItem;
+        return { ...item, cantidad: newQuantity, precioTotal: item.detallesProducto.precio * newQuantity };
       }
       return item;
     });
@@ -56,6 +55,13 @@ const Cart = () => {
       console.error('Error al actualizar la cantidad en la base de datos:', error);
     }
   };
+
+  const formatDetailName = (key) => {
+    return key
+      .replace(/([a-zñ])([A-Z])/g, '$1 $2') 
+      .replace(/^\w/, (char) => char.toUpperCase());
+  };
+  
 
   return (
     <div className="container mt-4">
@@ -77,11 +83,11 @@ const Cart = () => {
                 <tr key={item._id}>
                   <td>{item.nombreProducto}</td>
                   <td>
-                    <strong>Nombre del Fallecido:</strong> {item.detallesProducto.nombreMuerto} <br />
-                    <strong>Fecha de Nacimiento:</strong> {item.detallesProducto.fechaNacimiento} <br />
-                    <strong>Fecha de Defunción:</strong> {item.detallesProducto.fechaDefuncion} <br />
-                    <strong>Diseño:</strong> {item.detallesProducto.diseno} <br />
-                    <strong>Precio:</strong> ${item.detallesProducto.precio}
+                    {Object.entries(item.detallesProducto).map(([key, value]) => (
+                      <div key={key}>
+                        <strong>{formatDetailName(key)}:</strong> {value}
+                      </div>
+                    ))}
                   </td>
                   <td>
                     <input
@@ -94,10 +100,7 @@ const Cart = () => {
                   </td>
                   <td>${item.precioTotal}</td>
                   <td>
-                    <button
-                      className="btn btn-danger"
-                      onClick={() => handleRemoveItem(item._id)}
-                    >
+                    <button className="btn btn-danger" onClick={() => handleRemoveItem(item._id)}>
                       Eliminar
                     </button>
                   </td>

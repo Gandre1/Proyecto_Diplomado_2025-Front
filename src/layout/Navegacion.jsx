@@ -1,11 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { FaShoppingCart } from "react-icons/fa";
 
 const Navbar = () => {
   return (
     <nav className="navbar navbar-expand-lg bg-dark border-bottom border-body" data-bs-theme="dark">
       <div className="container-fluid">
-        <Link className="navbar-brand" to="/">Inicio</Link>
+        <Link className="navbar-brand mx-auto" to="/">Inicio</Link>
         <button
           className="navbar-toggler"
           type="button"
@@ -17,52 +18,30 @@ const Navbar = () => {
         >
           <span className="navbar-toggler-icon"></span>
         </button>
-        <div className="collapse navbar-collapse" id="navbarScroll">
-          <ul
-            className="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll"
-            style={{ "--bs-scroll-height": "100px" }}
-          >
-            <li className="nav-item dropdown">
-              <button
-                className="nav-link dropdown-toggle"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                Más
-              </button>
-              <ul className="dropdown-menu">
-                <li>
-                  <Link className="dropdown-item" to="/login">
-                    Iniciar Sesión
-                  </Link>
-                </li>
-                <li>
-                  <Link className="dropdown-item" to="/registrarse">
-                    Registrarse
-                  </Link>
-                </li>
-                <li>
-                  <hr className="dropdown-divider" />
-                </li>
-                <li>
-                  <Link className="dropdown-item" to="/carrito">
-                    Carrito
-                  </Link>
-                </li>
-              </ul>
-            </li>
-          </ul>
-          <form className="d-flex" role="search">
+        <div className="collapse navbar-collapse justify-content-center" id="navbarScroll">
+          <form className="d-flex w-50" role="search">
             <input
               className="form-control me-2"
               type="search"
-              placeholder="Buscar"
+              placeholder="Buscar productos..."
               aria-label="Search"
             />
             <button className="btn btn-outline-success" type="submit">
               Buscar
             </button>
           </form>
+        </div>
+
+        <div className="d-flex align-items-center">
+          <Link className="btn btn-outline-light me-2" to="/login">
+            Iniciar Sesión
+          </Link>
+          <Link className="btn btn-outline-light me-2" to="/registrarse">
+            Registrarse
+          </Link>
+          <Link className="btn btn-outline-light" to="/carrito">
+            <FaShoppingCart />
+          </Link>
         </div>
       </div>
     </nav>

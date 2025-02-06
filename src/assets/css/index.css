@@ -19,35 +19,34 @@
     margin: 0 auto;
   }
     
-.card {
-  max-width: 16rem;  
-  margin-bottom: 0.75rem; 
-  margin-left: 0.25rem;
-  margin-right: 0.25rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  transition: transform 0.2s;
-}
-
-.card:hover {
-  transform: scale(1.05);
-}
-
-.card-img-top {
-  max-width: 100%;  
-  height: auto;     
-  object-fit: contain;
-}
-
-.card-body {
-  padding: 0.75rem; 
-}
-
-.row {
-  margin-left: -0.25rem; 
-  margin-right: -0.25rem;
-}
-
+  .card {
+    max-width: 16rem;  
+    margin-bottom: 0.75rem; 
+    margin-left: 0.25rem;
+    margin-right: 0.25rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    transition: transform 0.2s;
+  }
+  
+  .card:hover {
+    transform: scale(1.05);
+  }
+  
+  .card-img-top {
+    max-width: 100%;  
+    height: auto;     
+    object-fit: contain;
+  }
+  
+  .card-body {
+    padding: 0.75rem; 
+  }
+  
+  .row {
+    margin-left: -0.25rem; 
+    margin-right: -0.25rem;
+  }
   
 
  
