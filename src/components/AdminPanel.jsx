@@ -97,7 +97,7 @@ const AdminPanel = () => {
           op.imagen.trim() &&
           op.tamanosxPrecios.every(
             (tp) =>
-              tp.precio.trim() &&
+              tp.precio &&
               !isNaN(tp.precio) &&
               tp.precio > 0 &&
               tp.tamano.trim()
