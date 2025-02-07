@@ -191,11 +191,10 @@ const LapidaForm = () => {
                 alt="Imagen de Diseño"
                 style={{
                   position: 'absolute',
-                  top: '50%',
-                  left: '85%',
-                  width: '15%',
-                  height: '15%',
-                  objectFit: 'cover',
+                  top: '135px',
+                  left: '140px',
+                  width: '30%',
+                  height: '30%',
                   borderRadius: '10px',
                 }}
               />
