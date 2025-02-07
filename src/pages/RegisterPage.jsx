@@ -1,21 +1,22 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import RegisterForm from '../components/RegisterForm';
-import Navbar from '../layout/Navegacion';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
 
-
-  const handleRegisterSuccess = () => {
+  const handleRegisterSuccess = (userData) => {
     alert('¡Registro exitoso!');
-    navigate('/'); 
+
+    localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem('token', userData.token);
+
+    navigate('/');
   };
-  
+
   return (
     <div>
-      <Navbar/>
-       <RegisterForm onRegisterSuccess={handleRegisterSuccess}/> 
+      <RegisterForm onRegisterSuccess={handleRegisterSuccess} />
     </div>
   );
 };

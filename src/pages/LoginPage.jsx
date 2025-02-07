@@ -1,19 +1,22 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import LoginForm from '../components/LoginForm';
-import Navbar from '../layout/Navegacion';
 
 const LoginPage = () => {
   const navigate = useNavigate();
 
-  const handleLoginSuccess = () => {
-    const role = localStorage.getItem('role');
-    navigate(role === 'admin' ? '/admin' : '/');
+  const handleLoginSuccess = (userData) => {
+    localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem('token', userData.token);
+
+    const isAdmin = userData.role && userData.role.toLowerCase() === 'admin';
+
+    navigate(isAdmin ? '/admin' : '/');
+    window.location.reload();
   };
-  
+
   return (
     <div>
-      <Navbar/>
       <LoginForm onLoginSuccess={handleLoginSuccess} />
     </div>
   );

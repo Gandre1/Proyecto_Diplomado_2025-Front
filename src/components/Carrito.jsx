@@ -7,7 +7,13 @@ const Cart = () => {
   useEffect(() => {
     const fetchCartItems = async () => {
       try {
-        const response = await api.get('/carrito');
+        const token = localStorage.getItem('token');
+        console.log(token);
+        const response = await api.get('/carrito', {
+          headers: {
+            Authorization: `Bearer ${token}`, 
+          },
+        });
         setCartItems(response.data);
       } catch (error) {
         console.error('Error al cargar el carrito:', error);

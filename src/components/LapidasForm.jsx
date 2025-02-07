@@ -15,6 +15,9 @@ const LapidaForm = () => {
   const [showModal, setShowModal] = useState(false);
   const [colorSeleccionado, setColorSeleccionado] = useState('');
   const [imagenLapida, setImagenLapida] = useState('');
+  
+  const [tamanoSeleccionado, setTamanoSeleccionado] = useState('');
+  const [precioTamano, setPrecioTamano] = useState(0);
 
   const navigate = useNavigate();
 
@@ -24,17 +27,29 @@ const LapidaForm = () => {
     const [year, month, day] = date.split('-');
     return `${months[parseInt(month) - 1]}. ${parseInt(day)} - ${year}`;
   };
-    
+  
+  const [posicionesTexto, setPosicionesTexto] = useState({
+    nombre: { x: 50, y: -335 }, 
+    fechaNacimiento: { x: 22, y: -190 },
+    fechaDefuncion: { x: 85, y: -190 }
+  });
+  
   useEffect(() => {
     const fetchLapidaData = async () => {
       try {
         const lapidaResponse = await api.get(`/lapidas/${lapidaId}`);
         if (lapidaResponse.data) {
           setLapida(lapidaResponse.data);
-
+  
           if (lapidaResponse.data.opciones.length > 0) {
             setColorSeleccionado(lapidaResponse.data.opciones[0].color);
             setImagenLapida(lapidaResponse.data.opciones[0].imagen);
+            setTamanoSeleccionado(lapidaResponse.data.opciones[0].tamanosxPrecios[0].tamano);
+            setPrecioTamano(lapidaResponse.data.opciones[0].tamanosxPrecios[0].precio);
+          }
+  
+          if (lapidaResponse.data.posicionesTexto) {
+            setPosicionesTexto(lapidaResponse.data.posicionesTexto);
           }
         } else {
           console.error('No se encontraron lápidas en la respuesta');
@@ -62,6 +77,18 @@ const LapidaForm = () => {
     const opcion = lapida.opciones.find(op => op.color === color);
     if (opcion) {
       setImagenLapida(opcion.imagen);
+      setTamanoSeleccionado(opcion.tamanosxPrecios[0].tamano);  
+      setPrecioTamano(opcion.tamanosxPrecios[0].precio);
+    }
+  };
+
+  const handleTamanoChange = (e) => {
+    const tamano = e.target.value;
+    setTamanoSeleccionado(tamano);
+    const opcion = lapida.opciones.find(op => op.color === colorSeleccionado);
+    const tamanoSeleccionado = opcion.tamanosxPrecios.find(t => t.tamano === tamano);
+    if (tamanoSeleccionado) {
+      setPrecioTamano(tamanoSeleccionado.precio);
     }
   };
 
@@ -93,27 +120,39 @@ const LapidaForm = () => {
         fechaDefuncion,
         diseño: nombreDiseno,
         color: colorSeleccionado,
-        precio: lapida.precio,
+        tamano: tamanoSeleccionado,
+        precio: precioTamano,
       };
   
       const nombreProducto = lapida.nombre;
       const cantidad = 1;
-      const precioTotal = lapida.precio * cantidad;
+      const precioTotal = precioTamano * cantidad;
   
       try {
-        await api.post('/carrito', {
-          nombreProducto,
-          detallesProducto,
-          cantidad,
-          precioTotal,
-        });
+        const token = localStorage.getItem('token');
+          if (!token) {
+            alert('Por favor inicie sesión para agregar productos al carrito.');
+            return;
+          }
+
+          await api.post('/carrito', {
+            nombreProducto,
+            detallesProducto,
+            cantidad,
+            precioTotal,
+          }, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+  
         setShowModal(true);
       } catch (error) {
         console.error('Error al agregar al carrito:', error);
         alert('Error al agregar al carrito');
       }
     }
-  };
+  };  
   
 
   const handleModalAction = (action) => {
@@ -132,7 +171,15 @@ const LapidaForm = () => {
     <div className="container mt-4">
       <div className="row">
         <div className="col-md-4">
-          <div className="border p-3 position-relative text-center bg-light" style={{ borderRadius: '10px', overflow: 'hidden', position: 'relative' }}>
+          <div className="border p-3 position-relative text-center bg-light" 
+          style={{ 
+            borderRadius: '10px', 
+            overflow: 'hidden', 
+            position: 'relative',
+            width: "400px", 
+            height: "400px", 
+            background: "#eee"
+            }}>
             <img
               src={api.defaults.baseURL + imagenLapida}
               alt="Imagen de Lápida"
@@ -154,69 +201,72 @@ const LapidaForm = () => {
               />
             )}
 
-            <div className="position-relative text-center" style={{ width: '100%', height: '100%' }}>
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '-335px',
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  width: '80%',
-                  height: '20%',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  fontSize: 'clamp(1rem, 5vw, 3rem)',
-                  textAlign: 'center',
-                  color: '#000',
-                  fontWeight: 'bold',
-                  fontFamily: 'serif',
-                }}
-              >
-                <h4>{nombreFallecido || 'Nombre del Fallecido'}</h4>
-              </div>
+            <div 
+              className="position-absolute w-100 h-100 d-flex flex-column align-items-center justify-content-center" 
+              style={{ top: 0, left: 0 }}
+            >
+            <div
+              style={{
+                position: 'absolute',
+                top: `${posicionesTexto.nombre.y}px`,
+                left: `${posicionesTexto.nombre.x}px`,
+                transform: 'translateX(-50%)',
+                width: '80%',
+                height: '20%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                fontSize: 'clamp(1rem, 5vw, 3rem)',
+                textAlign: 'center',
+                color: '#000',
+                fontWeight: 'bold',
+                fontFamily: 'serif',
+              }}
+            >
+              <h4>{nombreFallecido || 'Nombre del Fallecido'}</h4>
+            </div>
 
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '-190px',
-                  left: '22%',
-                  transform: 'translateX(-50%)',
-                  width: '20%',
-                  height: '15%',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  fontSize: '0.75vw',
-                  textAlign: 'center',
-                  color: '#000',
-                  fontWeight: 'normal',
-                  fontFamily: 'serif',
-                }}
-              >
-                <p>{fechaNacimiento ? `${formatDate(fechaNacimiento)}` : 'Fecha de Nacimiento'}</p>
-              </div>
+            <div
+              style={{
+                position: 'absolute',
+                top: `${posicionesTexto.fechaNacimiento.y}px`,
+                left: `${posicionesTexto.fechaNacimiento.x}px`,
+                transform: 'translateX(-50%)',
+                width: '20%',
+                height: '15%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                fontSize: '0.75vw',
+                textAlign: 'center',
+                color: '#000',
+                fontWeight: 'normal',
+                fontFamily: 'serif',
+              }}
+            >
+              <p>{fechaNacimiento ? `${formatDate(fechaNacimiento)}` : 'Fecha de Nacimiento'}</p>
+            </div>
 
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '-190px',
-                  left: '85%',
-                  transform: 'translateX(-50%)',
-                  width: '20%',
-                  height: '15%',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  fontSize: '0.75vw',
-                  textAlign: 'center',
-                  color: '#000',
-                  fontWeight: 'normal',
-                  fontFamily: 'serif',
-                }}
-              >
-                <p>{fechaDefuncion ? `${formatDate(fechaDefuncion)}` : 'Fecha de Defunción'}</p>
-              </div>
+            <div
+              style={{
+                position: 'absolute',
+                top: `${posicionesTexto.fechaDefuncion.y}px`,
+                left: `${posicionesTexto.fechaDefuncion.x}px`,
+                transform: 'translateX(-50%)',
+                width: '20%',
+                height: '15%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                fontSize: '0.75vw',
+                textAlign: 'center',
+                color: '#000',
+                fontWeight: 'normal',
+                fontFamily: 'serif',
+              }}
+            >
+              <p>{fechaDefuncion ? `${formatDate(fechaDefuncion)}` : 'Fecha de Defunción'}</p>
+            </div>
             </div>
           </div>
 
@@ -260,22 +310,29 @@ const LapidaForm = () => {
             <div className="mb-3">
               <label>Color:</label>
               <select className="form-control" value={colorSeleccionado} onChange={handleColorChange}>
-                {lapida.opciones.map((opcion) => (
-                  <option key={opcion.color} value={opcion.color}>
+                {lapida.opciones.map((opcion, index) => (
+                  <option key={index} value={opcion.color}>
                     {opcion.color}
                   </option>
                 ))}
               </select>
             </div>
-
+            <div className="mb-3">
+              <label>Tamaño:</label>
+              <select className="form-control" value={tamanoSeleccionado} onChange={handleTamanoChange}>
+                {lapida.opciones
+                  .find(opcion => opcion.color === colorSeleccionado)
+                  .tamanosxPrecios.map((tamano, index) => (
+                    <option key={index} value={tamano.tamano}>
+                      {tamano.tamano}
+                    </option>
+                  ))}
+              </select>
+            </div>
             <div className="mb-3">
               <label>Diseño:</label>
-              <select
-                className="form-control"
-                value={disenoSeleccionado}
-                onChange={(e) => setDisenoSeleccionado(e.target.value)}
-              >
-                <option value="">Seleccione</option>
+              <select className="form-control" value={disenoSeleccionado} onChange={(e) => setDisenoSeleccionado(e.target.value)}>
+                <option value="">Seleccionar diseño</option>
                 {disenos.map((diseno) => (
                   <option key={diseno._id} value={diseno._id}>
                     {diseno.nombre}
@@ -283,39 +340,27 @@ const LapidaForm = () => {
                 ))}
               </select>
             </div>
-
             <div className="mb-3">
-              <label>Precio: </label>
-              <span style={{ marginLeft: '5px' }}>${lapida.precio}</span>
+              <label>Precio: ${precioTamano}</label>
             </div>
-
-            <button type="button" className="btn btn-primary" onClick={agregarAlCarrito}>
-              Agregar al Carrito
-            </button>
+            <button className="btn btn-primary" onClick={agregarAlCarrito}>Agregar al carrito</button>
           </div>
         </div>
       </div>
-
       {showModal && (
-        <div className="modal fade show" tabIndex="-1" style={{ display: 'block' }} aria-hidden="true">
+        <div className="modal show" tabIndex="-1" style={{ display: 'block' }}>
           <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Producto Agregado</h5>
-                <button type="button" className="close" onClick={() => setShowModal(false)} aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
+                <h5 className="modal-title">Producto agregado al carrito</h5>
+                <button type="button" className="btn-close" onClick={() => setShowModal(false)}></button>
               </div>
               <div className="modal-body">
-                <p>¿Desea ir al carrito?</p>
+                <p>El producto se ha agregado correctamente al carrito.</p>
               </div>
               <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => handleModalAction('goToCart')}>
-                  Ir al Carrito
-                </button>
-                <button type="button" className="btn btn-primary" onClick={() => handleModalAction('goHome')}>
-                  Volver al Inicio
-                </button>
+                <button type="button" className="btn btn-secondary" onClick={() => handleModalAction('goToCart')}>Ir al carrito</button>
+                <button type="button" className="btn btn-primary" onClick={() => handleModalAction('continueShopping')}>Seguir comprando</button>
               </div>
             </div>
           </div>

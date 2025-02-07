@@ -9,12 +9,19 @@ const LoginForm = ({ onLoginSuccess }) => {
     e.preventDefault();
     try {
       const response = await api.post('/users/login', { username, password });
-      localStorage.setItem('role', response.data.role);
-      onLoginSuccess();
+      console.log('Respuesta recibida:', response); 
+      if (response && response.data) {
+        localStorage.setItem('token', response.data.token);
+        onLoginSuccess(response.data);
+      } else {
+        throw new Error('Respuesta inválida');
+      }
     } catch (error) {
-      alert('Error al iniciar sesión: ' + error.response.data.message);
+      console.error('Error en login:', error);
+      alert('Error al iniciar sesión: ' + (error.response?.data?.message || error.message));
     }
   };
+  
 
   return (
     <div className="card text-center" style={{ margin: '50px auto', width: '400px' }}>
